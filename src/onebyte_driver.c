@@ -43,14 +43,21 @@ ssize_t onebyte_read(struct file* filep, char* buf, size_t count, loff_t* f_pos)
     // copy data to user space 
     raw_copy_to_user(buf, onebyte_data, 1);
 
-    return 1;
+    if (*f_pos == 0) {
+        *f_pos++;
+        return 1;
+    }
+    return 0;
 }
 
 ssize_t onebyte_write(struct file* filep, const char* buf, size_t count, loff_t* f_pos)
 {
+    if (count > 1) {
+        return -ENOSPC;
+    }
     // copyt data to kernel space
     raw_copy_from_user(onebyte_data, buf+count-1, 1);
-
+    
     return 1;
 }
 
