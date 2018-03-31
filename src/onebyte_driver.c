@@ -52,13 +52,10 @@ ssize_t onebyte_read(struct file* filep, char* buf, size_t count, loff_t* f_pos)
 
 ssize_t onebyte_write(struct file* filep, const char* buf, size_t count, loff_t* f_pos)
 {
-    if (count > 1) {
-        return -ENOSPC;
-    }
     // copyt data to kernel space
-    raw_copy_from_user(onebyte_data, buf+count-1, 1);
+    raw_copy_from_user(onebyte_data, buf, 1);
     
-    return 1;
+    return count > 1 ? -ENOSPC : 1;
 }
 
 static int onebyte_init(void)
